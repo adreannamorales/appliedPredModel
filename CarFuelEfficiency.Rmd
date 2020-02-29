@@ -53,6 +53,7 @@ between = list(x = 1.2))
 
 ```
 
+
 ##d differences in mean fuel efficiency 2010 to 2011
 
 $H_O$: no difference between FE in 2010 and 2011
@@ -68,6 +69,9 @@ t.test(cars2010a$FE, cars2011a$FE)
 
 Question #1
 No evidence of any improvement/differemce in mean FE between 2010 and 2011
+
+
+
 
 
 
@@ -89,76 +93,54 @@ print(mean(testTranny$FE))
 ```
 
 ```{r}
-#levels(cars2010a$ExhaustValvesPerCyl)
+levels(cars2010a$ExhaustValvesPerCyl)
 trannyvalveModel = glm(FE ~ Transmission + ExhaustValvesPerCyl, data = testTranny)
-summary(trannyModel)
+summary(trannyvalveModel)
 ```
 
-
-
-```
-
-### regession fit
+## ANOVA
 
 ```{r}
-model1 = glm(FE~ EngDispl, data=cars2010a)
-summary(model1)
-plot(cars2010a$EngDispl, cars2010a$FE, xlab = 'Engine Displacement, L', ylab = 'Fuel Efficiency, MPG')
-abline(model1, col='red')
+
+model6 = glm(FE ~ EngDispl+NumCyl+AirAspirationMethod+TransCreeperGear+DriveDesc,data =cars2010a)
+
+summary(model6)
+
+anova(model6)
+
+
 ```
-
-### how does this fit model year 2011?
+Its appears that TransCreeperGear is a drag leave it out; drive desc fronyt 2 wheel 
 ```{r}
-plot(cars2011a$EngDispl, cars2011a$FE, xlab = 'Engine Displacement,L',ylab='MPG')
-x = cars2011a$EngDispl
-y = model1$coefficients[1] + model1$coefficients[2]*x
-lines(x,y, col='red')
-```
+pruned2010a = filter(cars2010a, TransCreeperGear==0 & DriveDesc== 'TwoWheelDriveFront' & EngDispl < 2.2)
 
 
-
-may benefit from a second order term
-
-```{r}
-model2 = glm(FE~ EngDispl + I(EngDispl^2), data = cars2010a)
+model2 = glm(FE ~ EngDispl+NumCyl, data=pruned2010a)
 
 summary(model2)
+
+anova(model2)
 ```
 
-### include transmission in the equation:
+
+make a prediction for 2011
+
 
 ```{r}
-levels(cars2010a$Transmission)
-model3 = glm(FE~ EngDispl+Transmission, data = cars2010a)
-summary(model3)
+pred2011 = predict(model2, cars2011a) 
+#print(pred2011)
+hist(pred2011)
+boxplot(pred2011, main= 'data from 2011\nmodelall')
 
 ```
 
 
 
-### predictions
+## Compare average FE for 2011 cars using model1 to FE for all cars in 2010
 ```{r}
-plot(cars2011a$EngDispl, cars2011a$FE, ylab='MPG', xlab='Engine displacement, L')
-newData = cars2011a
-y = predict(model3, newdata = cars2011a)
-
-lines(cars2011a$EngDispl,y, col='grey')
-
-#fit a smooth line to y then plot
-ySmooth= glm(y~cars2011a$EngDispl)
-summary(ySmooth)
-abline(ySmooth, col='red')
-
+t.test(cars2011a$FE, pred2011)
 ```
 
-Transmission effects ??
-
-```{r}
-
-model3AOV = aov(cars2010a$FE~cars2010a$Transmission)
-summary(model3AOV)
-TukeyHSD(model3AOV)
-```
 
 
 
