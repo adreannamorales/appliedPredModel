@@ -83,14 +83,27 @@ names(cars2010a)
 try transmissons = AV, AM6 and AM7
 
 ```{r}
-testTranny = filter(cars2010a, Transmission %in% c('AV','AM7'))
-
-trannyModel= glm(FE ~ Transmission, data = testTranny)
+testTranny = filter(cars2010a, Transmission %in% c('AV', 'M5','AM6'))
+trannyModel = glm(FE ~ Transmission, data = testTranny)
 summary(trannyModel)
 
 print(mean(testTranny$FE))
 
 ```
+### Anova on Transmission Only
+```{r}
+model9 = glm(FE ~ Transmission,data = cars2010a)
+
+summary (model9)
+
+anova(model9)
+
+```
+Transmission AV and M5 have the least negative impact to fuel efficiency
+
+
+Try adding air asperation method to see what it does
+
 
 ```{r}
 levels(cars2010a$ExhaustValvesPerCyl)
@@ -99,7 +112,17 @@ summary(trannyvalveModel)
 ```
 
 ## ANOVA
+```{r}
+model8 = glm(FE ~ EngDispl+NumCyl+AirAspirationMethod+VarValveTiming+NumGears+IntakeValvePerCyl+VarValveLift+TransLockup +ExhaustValvesPerCyl+TransCreeperGear,data = cars2010a)
 
+summary (model8)
+
+anova(model8)
+
+```
+### 2 Answer
+
+The Front Wheel Drive has a statistical significance to improve FE by 5.67. Engine displacement reduces FE by 4.01 as it increases in size. Number of cylynders increases significance when engine displacement is not a factor. Variable valve timing does have a significant effect to improve FE by 1.65. Trans lockup reduces FE by 1.5 as it increases. Exhaust valves per cylynder becomes significant only when engine displacement and number of cylynders are not a factor; once those are removed the number of exhaust valves improves FE by 8.
 ```{r}
 
 model6 = glm(FE ~ EngDispl+NumCyl+AirAspirationMethod+TransCreeperGear+DriveDesc,data =cars2010a)
@@ -112,7 +135,7 @@ anova(model6)
 ```
 Its appears that TransCreeperGear is a drag leave it out; drive desc fronyt 2 wheel 
 ```{r}
-pruned2010a = filter(cars2010a, TransCreeperGear==0 & DriveDesc== 'TwoWheelDriveFront' & EngDispl < 2.2)
+pruned2010a = filter(cars2010a, TransCreeperGear==0 & DriveDesc== 'TwoWheelDriveFront' & EngDispl < 3)
 
 
 model2 = glm(FE ~ EngDispl+NumCyl, data=pruned2010a)
@@ -140,7 +163,9 @@ boxplot(pred2011, main= 'data from 2011\nmodelall')
 ```{r}
 t.test(cars2011a$FE, pred2011)
 ```
+3. Suggest ways in which fuel efficiency could be improved in future years.
 
+### 3 Answer
 
-
+Suggested improvements for future years would be to only make front wheeled drive vehicles. also, they smaller the engine displacement they can manufacture while keeping the car able to perform will be the most beneficial improvement. Also variable valve timing does improve efficiency when it is used. Trans lockup should not be used if FE is the only factor that they are looking to improve, it may have other benefits, but it is a detriment to fuel effeciency.
 
